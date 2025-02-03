@@ -18,10 +18,8 @@ public class LandingPage {
 
     public LandingPage(Stage primaryStage){this.stage = primaryStage;}
     public void renderPage(){
-        //VBox landingPageLayOut = new VBox(10);
         GridPane landingPageLayOut = new GridPane();
         ArrayList<String> commandsList = getAllCommands();
-        landingPageLayOut.setPadding(new Insets(10));
         Button findCommandButton = new Button("Look up command");
         errorLabel = new Label();
         findCommandButton.setOnAction(new EventHandler<ActionEvent>() {
@@ -29,11 +27,14 @@ public class LandingPage {
             public void handle(ActionEvent actionEvent) {
                 try{
                     int command = Integer.parseInt(commandTextField.getText());
-                    if (command !=1 && command != 2 && command != 3){
+                    if (command>commandsList.size() || command<=0){
                         throw new RuntimeException("Unacceptable command");
                     }
                     errorLabel.setText("");
-                    // Go to next view
+                    String commandName = commandsList.get(command-1);
+                    String commandExp = commandsList.get(command);
+                    CommandDetails goToDetails = new CommandDetails(stage,commandName,commandExp);
+                    goToDetails.renderPage();
                 } catch (NumberFormatException e) {
                     errorLabel.setText("Unacceptable command");
                 }
@@ -54,9 +55,6 @@ public class LandingPage {
         landingPageLayOut.setHgap(10);
         landingPageLayOut.setVgap(10);
 
-        //landingPageLayOut.getChildren().addAll(new Label("Commands"),
-          //      new Label("Choose a command by entering a number"),commandTextField,
-            //    findCommandButton);
         landingPageUser = new Scene(landingPageLayOut,500,200);
         stage.setTitle("Commands");
         stage.setScene(landingPageUser);
@@ -72,6 +70,7 @@ public class LandingPage {
             ResultSet results = statement.executeQuery();
             while (results.next()){
                 result.add(results.getString(2));
+                result.add(results.getString(3));
             }
         } catch (Exception e) {
             e.printStackTrace();
